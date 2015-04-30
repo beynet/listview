@@ -22,6 +22,9 @@ public class ListViews extends Application {
     public void start(Stage primaryStage) throws Exception {
         this.currentStage = primaryStage;
         this.persons = new ListView<>();
+        this.persons.setCellFactory(param -> {
+            return new PersonCell();
+        });
 
 
         //une hbox pour tous nos futurs bouttons
