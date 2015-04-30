@@ -1,6 +1,8 @@
 package org.beynet.listview;
 
 import javafx.application.Application;
+import javafx.beans.Observable;
+import javafx.collections.FXCollections;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -9,6 +11,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.util.Optional;
 
@@ -22,13 +25,19 @@ public class ListViews extends Application {
     public void start(Stage primaryStage) throws Exception {
         this.currentStage = primaryStage;
         this.persons = new ListView<>();
+
+        //define the cell factory
         this.persons.setCellFactory(param -> {
             return new PersonCell();
         });
 
+        // associate the listview with a custom observable list
+        this.persons.setItems(FXCollections.observableArrayList(param -> new Observable[]{param.firstNameProperty(),param.lastNameProperty()} ) );
+
 
         //une hbox pour tous nos futurs bouttons
         HBox buttonsbox = new HBox();
+        // this button will add a new person
         Button addPerson = new Button("aj. person");
         addPerson.setOnAction(event -> {
             TextInputDialog askForName = new TextInputDialog();
@@ -41,7 +50,16 @@ public class ListViews extends Application {
                 }
             });
         });
-        buttonsbox.getChildren().add(addPerson);
+        //this button will permute the selected person name and first name
+        Button permut = new Button("permut");
+        permut.setOnAction(event -> {
+            Person selected = this.persons.getSelectionModel().getSelectedItem();
+            if (selected!=null) {
+                selected.permutFirstNameAndLastName();
+            }
+        });
+
+        buttonsbox.getChildren().addAll(addPerson,permut);
 
         // premier empilement vertical
         VBox vbox = new VBox();
@@ -49,8 +67,8 @@ public class ListViews extends Application {
         vbox.getChildren().add(buttonsbox);
 
 
-        persons.getItems().add(new Person("John","Doe"));
-        persons.getItems().add(new Person("MyNameIs","Person"));
+        persons.getItems().add(new Person("John", "Doe"));
+        persons.getItems().add(new Person("MyNameIs", "Person"));
 
         Group group = new Group();
         group.getChildren().add(vbox);
@@ -60,7 +78,7 @@ public class ListViews extends Application {
         currentStage.setScene(currentScene);
         currentStage.show();
 
-        persons.setPrefHeight(currentScene.getHeight()-50);
+        persons.setPrefHeight(currentScene.getHeight() - 50);
     }
 
 
